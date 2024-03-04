@@ -19,7 +19,27 @@ public class EmployeeController : ControllerBase
     [HttpGet("getAllEmployees")]
     public async Task<IActionResult> GetEmployees()
     {
-        return Ok(await _services.GetEmployeesAsync());
+        var employees = await _services.GetEmployeesAsync();
+
+        if (employees is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(employees);
+    }
+
+    [HttpGet("getEmployee/{id}")]
+    public async Task<IActionResult> GetEmployeeById(int id)
+    {
+        var employee = await _services.GetEmployeeByIdAsync(id);
+
+        if (employee is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(employee);
     }
 
     [HttpPost("CreateEmployee")]
@@ -36,6 +56,37 @@ public class EmployeeController : ControllerBase
 
     }
 
+    [HttpPut("UpdateEmployee")]
+    public async Task<IActionResult> UpdateEmployee(int id, Employee employee)
+    {
+        if (id != employee.Id)
+        {
+            return BadRequest();
+        }
 
+        var existingEmployee = await _services.GetEmployeeByIdAsync(id);
 
+        if (existingEmployee is null)
+            return NotFound();
+
+        existingEmployee.FirstName = employee.FirstName;
+        existingEmployee.LastName = employee.LastName;
+        existingEmployee.Gender = employee.Gender;
+        existingEmployee.Salary = employee.Salary;
+        existingEmployee.HasHealthInsurance = employee.HasHealthInsurance;
+
+        if (await _services.UpdateEmployeeAsync(existingEmployee))
+            return NoContent();
+
+        return BadRequest();
+    }
+
+    [HttpDelete("DeleteEmployee/{id}")]
+    public async Task<IActionResult> DeleteEmployee(int id)
+    {
+        if (await _services.DeleteEmployeeAsync(id))
+            return NoContent();
+
+        return NotFound();
+    }
 }

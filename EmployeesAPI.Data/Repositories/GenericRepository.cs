@@ -39,7 +39,7 @@ namespace EmployeesAPI.Data.Repositories
 
             try
             {
-                var existingEntity = await _dbContext.Set<T>().FindAsync(cancellationToken);
+                var existingEntity = await _dbContext.Set<T>().FindAsync(id, cancellationToken);
 
                 if (existingEntity is not null)
                 {
